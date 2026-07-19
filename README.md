@@ -54,6 +54,35 @@ make doctor
 
 Doctor validates required command-line tools, local services, and expected local model availability.
 
+
+### Run the Docker Compose foundation
+
+Copy the example environment file before starting the stack if you want a local override file:
+
+```bash
+cp .env.example .env
+```
+
+Start the core AI Platform services with Docker Compose v2:
+
+```bash
+docker compose up -d
+```
+
+The default stack starts Ollama and persists model data in a named Docker volume. Optional placeholder services can be enabled with profiles when needed:
+
+```bash
+docker compose --profile webui --profile vector-db up -d
+```
+
+Stop and remove the Compose-managed containers and network with:
+
+```bash
+docker compose down
+```
+
+Named volumes are retained by default so local model, Web UI, and vector database data are not removed accidentally.
+
 ### Run lint checks
 
 ```bash
