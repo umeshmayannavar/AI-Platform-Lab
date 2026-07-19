@@ -1,0 +1,41 @@
+name: Platform Foundation CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  validate:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+
+      - name: Check Bash Syntax
+        run: |
+          for file in scripts/*.sh; do
+            bash -n "$file"
+          done
+
+      - name: Validate Bash Scripts
+        run: |
+          shellcheck scripts/*.sh
+
+      - name: Verify Makefile
+        run: |
+          make help
