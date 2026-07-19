@@ -8,11 +8,11 @@
 # Safe to run multiple times.
 ###############################################################################
 
-set -uo pipefail
+set -euo pipefail
 
-GREEN="\033[0;32m"
-RED="\033[0;31m"
-NC="\033[0m"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
 
 PASS=0
 FAIL=0
@@ -21,31 +21,15 @@ FAIL=0
 # Helper Functions
 ###############################################################################
 
-header() {
-    echo
-    echo "============================================================"
-    echo "              AI Platform Bootstrap"
-    echo "============================================================"
-    echo
-}
-
-section() {
-    echo
-    echo "------------------------------------------------------------"
-    echo "$1"
-    echo "------------------------------------------------------------"
-}
-
-success() {
-    printf "${GREEN}✓ %-20s${NC}\n" "$1"
+mark_success() {
+    success "$1"
     ((++PASS))
 }
 
 failure() {
-    printf "${RED}✗ %-20s${NC}\n" "$1"
+    error "$1"
     ((++FAIL))
 }
-
 
 ###############################################################################
 # Homebrew
@@ -53,8 +37,8 @@ failure() {
 
 check_homebrew() {
 
-    if command -v brew >/dev/null 2>&1; then
-        success "Homebrew"
+    if command_exists brew; then
+        mark_success "Homebrew"
     else
         failure "Homebrew Missing"
         echo
@@ -73,13 +57,12 @@ install_formula() {
     local package="$1"
 
     if brew list "$package" >/dev/null 2>&1; then
-        success "$package (installed)"
+        mark_success "$package (installed)"
     else
         info "Installing $package"
-        brew install "$package"
 
-        if brew list "$package" >/dev/null 2>&1; then
-            success "$package"
+        if brew install "$package" && brew list "$package" >/dev/null 2>&1; then
+            mark_success "$package"
         else
             failure "$package"
         fi
@@ -95,13 +78,12 @@ install_cask() {
     local package="$1"
 
     if brew list --cask "$package" >/dev/null 2>&1; then
-        success "$package (installed)"
+        mark_success "$package (installed)"
     else
         info "Installing $package"
-        brew install --cask "$package"
 
-        if brew list --cask "$package" >/dev/null 2>&1; then
-            success "$package"
+        if brew install --cask "$package" && brew list --cask "$package" >/dev/null 2>&1; then
+            mark_success "$package"
         else
             failure "$package"
         fi
@@ -112,7 +94,8 @@ install_cask() {
 # Main
 ###############################################################################
 
-header
+print_banner "              AI Platform Bootstrap"
+echo
 
 section "Checking Homebrew"
 
@@ -128,10 +111,8 @@ install_formula k9s
 install_formula ollama
 
 section "Summary"
-
 echo
-echo "Passed : $PASS"
-echo "Failed : $FAIL"
+print_summary "$PASS" "$FAIL"
 
 echo
 
