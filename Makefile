@@ -1,5 +1,5 @@
 ###############################################################################
-# AI Platform Foundation
+# AI Platform Lab
 #
 # Primary developer interface for the repository.
 ###############################################################################
@@ -11,8 +11,10 @@ BASH_SCRIPTS := $(wildcard $(SCRIPTS_DIR)/*.sh) $(wildcard $(SCRIPTS_DIR)/lib/*.
 
 DOCTOR := $(SCRIPTS_DIR)/platform-doctor.sh
 BOOTSTRAP := $(SCRIPTS_DIR)/bootstrap.sh
+MODEL_MANAGER := $(SCRIPTS_DIR)/model-manager.sh
 
-.PHONY: help doctor bootstrap lint status clean fmt
+.PHONY: help doctor bootstrap lint status clean fmt \
+        model-list model-pull model-remove
 
 ###############################################################################
 # Setup
@@ -36,6 +38,35 @@ lint: ## Run ShellCheck on project scripts
 	@shellcheck -P $(SCRIPTS_DIR) $(BASH_SCRIPTS)
 
 ###############################################################################
+# AI Models
+###############################################################################
+
+##@ AI Models
+
+model-list: ## List available Ollama models
+	@$(MODEL_MANAGER) list
+
+model-pull: ## Download an Ollama model
+	@if [ -z "$(MODEL)" ]; then \
+		echo "ERROR: MODEL is required."; \
+		echo ""; \
+		echo "Example:"; \
+		echo "  make model-pull MODEL=qwen3:8b"; \
+		exit 1; \
+	fi
+	@$(MODEL_MANAGER) pull $(MODEL)
+
+model-remove: ## Remove an Ollama model
+	@if [ -z "$(MODEL)" ]; then \
+		echo "ERROR: MODEL is required."; \
+		echo ""; \
+		echo "Example:"; \
+		echo "  make model-remove MODEL=qwen3:8b"; \
+		exit 1; \
+	fi
+	@$(MODEL_MANAGER) remove $(MODEL)
+
+###############################################################################
 # Development
 ###############################################################################
 
@@ -43,8 +74,8 @@ lint: ## Run ShellCheck on project scripts
 
 help: ## Show this help menu
 	@echo ""
-	@echo "AI Platform Foundation"
-	@echo "======================"
+	@echo "AI Platform Lab"
+	@echo "==============="
 	@echo ""
 	@echo "Usage: make <target>"
 	@echo ""
