@@ -81,6 +81,30 @@ Stop and remove the Compose-managed containers and network with:
 docker compose down
 ```
 
+## AI Model Management
+
+AI Platform Lab provides a thin wrapper around the Ollama CLI for common model management tasks.
+
+### List installed models
+
+```bash
+make model-list
+```
+
+### Download a model
+
+```bash
+make model-pull MODEL=qwen3:8b
+```
+
+### Remove a model
+
+```bash
+make model-remove MODEL=qwen3:8b
+```
+
+The Makefile delegates model management to `scripts/model-manager.sh`, keeping the Makefile focused on orchestration while the script contains the implementation logic.
+
 Named volumes are retained by default so local model, Web UI, and vector database data are not removed accidentally.
 
 ### Run lint checks
