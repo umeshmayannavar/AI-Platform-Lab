@@ -1,0 +1,83 @@
+# Docker Compose v2 foundation for local AI Platform services.
+#
+# Usage:
+#   1. Copy .env.example to .env when overriding defaults.
+#   2. Start the core stack with: docker compose up -d
+#   3. Start optional placeholders with profiles, for example:
+#      docker compose --profile webui --profile vector-db up -d
+
+name: ${COMPOSE_PROJECT_NAME:-ai-platform-lab}
+
+services:
+  ollama:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    container_name: ${COMPOSE_PROJECT_NAME:-ai-platform-lab}-ollama
+    restart: unless-stopped
+    environment:
+      OLLAMA_HOST: 0.0.0.0:${OLLAMA_CONTAINER_PORT:-11434}
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-24h}
+    ports:
+      - "${OLLAMA_HOST_PORT:-11434}:${OLLAMA_CONTAINER_PORT:-11434}"
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - ai-platform
+
+  # Placeholder for the platform web UI. It is behind a profile so the default
+  # stack remains lightweight while preserving a ready-to-enable configuration.
+  open-webui:
+    profiles: ["webui"]
+    image: ${OPEN_WEBUI_IMAGE:-ghcr.io/open-webui/open-webui:main}
+    container_name: ${COMPOSE_PROJECT_NAME:-ai-platform-lab}-open-webui
+    restart: unless-stopped
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_BASE_URL: http://ollama:${OLLAMA_CONTAINER_PORT:-11434}
+    ports:
+      - "${OPEN_WEBUI_HOST_PORT:-3000}:${OPEN_WEBUI_CONTAINER_PORT:-8080}"
+    volumes:
+      - open-webui-data:/app/backend/data
+    networks:
+      - ai-platform
+
+  # Placeholder vector database for future RAG workloads. Enable with the
+  # vector-db profile when a local Qdrant instance is needed.
+  qdrant:
+    profiles: ["vector-db"]
+    image: ${QDRANT_IMAGE:-qdrant/qdrant:latest}
+    container_name: ${COMPOSE_PROJECT_NAME:-ai-platform-lab}-qdrant
+    restart: unless-stopped
+    ports:
+      - "${QDRANT_HTTP_HOST_PORT:-6333}:${QDRANT_HTTP_CONTAINER_PORT:-6333}"
+      - "${QDRANT_GRPC_HOST_PORT:-6334}:${QDRANT_GRPC_CONTAINER_PORT:-6334}"
+    volumes:
+      - qdrant-data:/qdrant/storage
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "timeout 5 bash -c '</dev/tcp/127.0.0.1/${QDRANT_HTTP_CONTAINER_PORT:-6333}'",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - ai-platform
+
+networks:
+  ai-platform:
+    driver: bridge
+
+volumes:
+  ollama-data:
+  open-webui-data:
+  qdrant-data:
