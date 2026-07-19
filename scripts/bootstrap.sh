@@ -136,7 +136,7 @@ echo "Failed : $FAIL"
 echo
 
 if [[ $FAIL -eq 0 ]]; then
-    printf "${GREEN}Bootstrap completed successfully.${NC}\n"
+    printf "%b\n" "${GREEN}Bootstrap completed successfully.${NC}"
 else
-    printf "${RED}Bootstrap completed with errors.${NC}\n"
+    printf "%b\n" "${RED}Bootstrap completed with errors.${NC}"
 fi

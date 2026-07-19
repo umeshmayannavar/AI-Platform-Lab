@@ -16,7 +16,6 @@ set -uo pipefail
 GREEN="\033[0;32m"
 RED="\033[0;31m"
 YELLOW="\033[1;33m"
-BLUE="\033[0;34m"
 NC="\033[0m"
 
 PASS=0
@@ -149,10 +148,10 @@ summary() {
     echo
 
     if [[ $FAIL -eq 0 ]]; then
-        printf "${GREEN}✓ PLATFORM READY FOR DEVELOPMENT${NC}\n"
+        printf "%b\n" "${GREEN}✓ PLATFORM READY FOR DEVELOPMENT${NC}"
         exit 0
     else
-        printf "${RED}✗ PLATFORM REQUIRES ATTENTION${NC}\n"
+        printf "%b\n" "${RED}✗ PLATFORM REQUIRES ATTENTION${NC}"
         exit 1
     fi
 }
