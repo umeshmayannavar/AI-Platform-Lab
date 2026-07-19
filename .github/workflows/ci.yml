@@ -28,13 +28,13 @@ jobs:
 
       - name: Check Bash Syntax
         run: |
-          for file in scripts/*.sh; do
+          for file in scripts/*.sh scripts/lib/*.sh; do
             bash -n "$file"
           done
 
       - name: Validate Bash Scripts
         run: |
-          shellcheck -x scripts/*.sh
+          shellcheck -P scripts scripts/*.sh scripts/lib/*.sh
 
       - name: Verify Makefile
         run: |
