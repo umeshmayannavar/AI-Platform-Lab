@@ -55,17 +55,24 @@ check_homebrew() {
 install_formula() {
 
     local package="$1"
+    local binary="${2:-$package}"
 
     if brew list "$package" >/dev/null 2>&1; then
-        mark_success "$package (installed)"
-    else
-        info "Installing $package"
+        mark_success "$package (already installed)"
+        return
+    fi
 
-        if brew install "$package" && brew list "$package" >/dev/null 2>&1; then
-            mark_success "$package"
-        else
-            failure "$package"
-        fi
+    if command_exists "$binary"; then
+        mark_success "$package (already available)"
+        return
+    fi
+
+    info "Installing $package"
+
+    if brew install "$package" && brew list "$package" >/dev/null 2>&1; then
+        mark_success "$package"
+    else
+        failure "$package"
     fi
 }
 
@@ -78,15 +85,16 @@ install_cask() {
     local package="$1"
 
     if brew list --cask "$package" >/dev/null 2>&1; then
-        mark_success "$package (installed)"
-    else
-        info "Installing $package"
+        mark_success "$package (already installed)"
+        return
+    fi
 
-        if brew install --cask "$package" && brew list --cask "$package" >/dev/null 2>&1; then
-            mark_success "$package"
-        else
-            failure "$package"
-        fi
+    info "Installing $package"
+
+    if brew install --cask "$package" && brew list --cask "$package" >/dev/null 2>&1; then
+        mark_success "$package"
+    else
+        failure "$package"
     fi
 }
 
