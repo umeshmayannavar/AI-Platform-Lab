@@ -158,6 +158,34 @@ The configured hooks check shell scripts, trailing whitespace, final newlines, Y
 
 ---
 
+## Python Development
+
+Create a virtual environment:
+
+```bash
+python3 -m venv .venv
+```
+
+Activate it:
+
+macOS/Linux
+
+```bash
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run:
+
+```bash
+python -m src.main
+```
+
 ## Documentation
 
 Start with:
