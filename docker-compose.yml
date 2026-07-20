@@ -50,7 +50,6 @@ services:
   # Placeholder vector database for future RAG workloads. Enable with the
   # vector-db profile when a local Qdrant instance is needed.
   qdrant:
-    profiles: ["vector-db"]
     image: ${QDRANT_IMAGE:-qdrant/qdrant:latest}
     container_name: ${COMPOSE_PROJECT_NAME:-ai-platform-lab}-qdrant
     restart: unless-stopped
