@@ -129,3 +129,8 @@ if [[ $FAIL -eq 0 ]]; then
 else
     printf "%b\n" "${RED}Bootstrap completed with errors.${NC}"
 fi
+
+if ! command -v uv >/dev/null 2>&1; then
+    echo "Installing uv..."
+    brew install uv
+fi
