@@ -13,8 +13,11 @@ DOCTOR := $(SCRIPTS_DIR)/platform-doctor.sh
 BOOTSTRAP := $(SCRIPTS_DIR)/bootstrap.sh
 MODEL_MANAGER := $(SCRIPTS_DIR)/model-manager.sh
 
+COMPOSE := docker compose
+
 .PHONY: help doctor bootstrap lint status clean fmt \
-        model-list model-pull model-remove
+        model-list model-pull model-remove \
+        up down restart ps logs
 
 ###############################################################################
 # Setup
@@ -65,6 +68,29 @@ model-remove: ## Remove an Ollama model
 		exit 1; \
 	fi
 	@$(MODEL_MANAGER) remove $(MODEL)
+
+
+###############################################################################
+# Platform
+###############################################################################
+
+##@ Platform
+
+up: ## Start the local AI platform
+	@$(COMPOSE) up -d
+
+down: ## Stop the local AI platform
+	@$(COMPOSE) down
+
+restart: ## Restart the local AI platform
+	@$(COMPOSE) restart
+
+ps: ## Show platform containers
+	@$(COMPOSE) ps
+
+logs: ## Follow platform logs
+	@$(COMPOSE) logs -f
+
 
 ###############################################################################
 # Development
