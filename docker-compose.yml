@@ -32,7 +32,6 @@ services:
   # Placeholder for the platform web UI. It is behind a profile so the default
   # stack remains lightweight while preserving a ready-to-enable configuration.
   open-webui:
-    profiles: ["webui"]
     image: ${OPEN_WEBUI_IMAGE:-ghcr.io/open-webui/open-webui:main}
     container_name: ${COMPOSE_PROJECT_NAME:-ai-platform-lab}-open-webui
     restart: unless-stopped
