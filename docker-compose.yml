@@ -46,6 +46,59 @@ services:
       - open-webui-data:/app/backend/data
     networks:
       - ai-platform
+  
+
+
+
+---
+
+# 4. Add architecture comments in docker-compose
+
+Above LiteLLM add:
+
+```yaml
+# -------------------------------------------------------------
+# LiteLLM Gateway
+#
+# OpenAI-compatible API
+#
+# Current Routing
+#
+# chat
+#    ↓
+# qwen3:8b
+#
+# Future
+#
+# code
+# embedding
+#
+# -------------------------------------------------------------
+
+
+  litellm:
+    image: ${LITELLM_IMAGE:-ghcr.io/berriai/litellm:main-latest}
+    container_name: ${COMPOSE_PROJECT_NAME:-ai-platform-lab}-litellm
+    restart: unless-stopped
+
+    command:
+      - --config
+      - /app/config/litellm.yaml
+      - --port
+      - "${LITELLM_CONTAINER_PORT:-4000}"
+
+    volumes:
+      - ./config/litellm.yaml:/app/config/litellm.yaml:ro
+
+    ports:
+      - "${LITELLM_HOST_PORT:-4000}:${LITELLM_CONTAINER_PORT:-4000}"
+
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+    networks:
+      - ai-platform
 
   # Placeholder vector database for future RAG workloads. Enable with the
   # vector-db profile when a local Qdrant instance is needed.
