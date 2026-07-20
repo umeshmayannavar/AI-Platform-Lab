@@ -147,3 +147,8 @@ venv: ## Create Python virtual environment
 
 install: ## Install Python dependencies
 	. .venv/bin/activate && pip install -r requirements.txt
+
+.PHONY: python-setup
+
+python-setup: ## Install Python dependencies
+	uv sync
