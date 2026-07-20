@@ -134,3 +134,16 @@ status: ## Show Git repository status
 clean: ## Remove temporary files
 	@find . -name ".DS_Store" -delete
 	@echo "Workspace cleaned."
+
+
+###############################################################################
+# Python
+###############################################################################
+
+##@ Python
+
+venv: ## Create Python virtual environment
+	python3 -m venv .venv
+
+install: ## Install Python dependencies
+	. .venv/bin/activate && pip install -r requirements.txt

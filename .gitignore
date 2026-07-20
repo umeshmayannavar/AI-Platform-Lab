@@ -57,3 +57,9 @@ override.tf.json
 coverage/
 dist/
 build/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
