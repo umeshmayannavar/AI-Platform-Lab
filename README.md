@@ -68,8 +68,25 @@ Start the core AI Platform services with Docker Compose v2:
 ```bash
 docker compose up -d
 ```
+### Start the AI Platform
 
-The default stack starts Ollama and persists model data in a named Docker volume. Optional placeholder services can be enabled with profiles when needed:
+```bash
+docker compose up -d
+```
+
+This starts:
+
+- Ollama
+- Open WebUI
+- Qdrant
+
+Available services:
+
+| Service | URL |
+|----------|-----|
+| Ollama | http://127.0.0.1:11434 |
+| Open WebUI | http://127.0.0.1:3000 |
+| Qdrant REST API | http://127.0.0.1:6333 |
 
 ```bash
 docker compose --profile webui --profile vector-db up -d
