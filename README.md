@@ -199,6 +199,37 @@ Run the indexer
 ```bash
 uv run python examples/index_documents.py
 ```
+## Semantic Search
+
+Index documents:
+
+```bash
+uv run python examples/index_documents.py
+```
+
+Search indexed documents:
+
+```bash
+uv run python examples/search.py
+```
+
+Example:
+
+```
+Search Query:
+What is Kubernetes?
+```
+
+Example Output:
+
+```
+Top Matches
+
+Score : 0.94
+Source: documents/sample.md
+
+Kubernetes is an open-source container orchestration platform...
+```
 
 
 ## Documentation
