@@ -1,7 +1,11 @@
 LICENSE
 README.md
 pyproject.toml
+src/ai_platform/chunking.py
+src/ai_platform/embeddings.py
 src/ai_platform/llm.py
+src/ai_platform/loader.py
+src/ai_platform/types.py
 src/ai_platform_lab.egg-info/PKG-INFO
 src/ai_platform_lab.egg-info/SOURCES.txt
 src/ai_platform_lab.egg-info/dependency_links.txt

@@ -1,117 +1,118 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# AI Platform Lab
-#
 # Model Manager
 #
-# Wrapper around the Ollama CLI.
+# Manage Ollama models running inside the Docker Compose container.
 ###############################################################################
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_NAME="${COMPOSE_PROJECT_NAME:-ai-platform-lab}"
+OLLAMA_CONTAINER="${PROJECT_NAME}-ollama"
 
-# shellcheck source=scripts/lib/common.sh
-source "$SCRIPT_DIR/lib/common.sh"
+###############################################################################
+# Helpers
+###############################################################################
+
+print_header() {
+    echo
+    echo "------------------------------------------------------------"
+    echo "$1"
+    echo "------------------------------------------------------------"
+}
 
 usage() {
     cat <<EOF
-
 Usage:
+  $0 list
+  $0 pull <model>
+  $0 remove <model>
 
-  model-manager.sh list
-
-  model-manager.sh pull <model>
-
-  model-manager.sh remove <model>
-
-Examples
-
-  model-manager.sh list
-
-  model-manager.sh pull qwen3:8b
-
-  model-manager.sh remove qwen3:8b
-
+Examples:
+  $0 list
+  $0 pull qwen3:8b
+  $0 pull nomic-embed-text
+  $0 remove qwen3:8b
 EOF
 }
 
-require_model() {
-
-    if [[ $# -lt 1 || -z "$1" ]]; then
-        printf "%bERROR:%b MODEL is required.\n" "$RED" "$NC"
+check_container() {
+    if ! docker ps --format '{{.Names}}' | grep -qx "$OLLAMA_CONTAINER"; then
+        echo "ERROR: Ollama container '$OLLAMA_CONTAINER' is not running."
+        echo
+        echo "Start it first:"
+        echo "  docker compose up -d"
         exit 1
     fi
 }
+
+run_ollama() {
+    docker compose exec -T ollama ollama "$@"
+}
+
+###############################################################################
+# Commands
+###############################################################################
+
 list_models() {
-
-    section "Available Models"
-
-    if ! ollama list | sed 1d | grep -q .; then
-        echo "No local models installed."
-        echo
-        echo "Download one with:"
-        echo "  make model-pull MODEL=qwen3:8b"
-        return
-    fi
-
-    ollama list
+    print_header "Available Models"
+    run_ollama list
 }
 
 pull_model() {
-
     local model="$1"
 
-    section "Pulling Model"
+    print_header "Pulling Model"
 
     echo "$model"
     echo
 
-    ollama pull "$model"
+    run_ollama pull "$model"
 }
 
 remove_model() {
-
     local model="$1"
 
-    section "Removing Model"
+    print_header "Removing Model"
 
     echo "$model"
     echo
 
-    ollama rm "$model"
+    run_ollama rm "$model"
 }
 
-main() {
+###############################################################################
+# Main
+###############################################################################
 
-    if [[ $# -lt 1 ]]; then
-        usage
-        exit 1
-    fi
+if [[ $# -lt 1 ]]; then
+    usage
+    exit 1
+fi
 
-    case "$1" in
+check_container
 
-        list)
-            list_models
-            ;;
-
-        pull)
-            require_model "${2:-}"
-            pull_model "$2"
-            ;;
-
-        remove)
-            require_model "${2:-}"
-            remove_model "$2"
-            ;;
-
-        *)
+case "$1" in
+    list)
+        list_models
+        ;;
+    pull)
+        [[ $# -eq 2 ]] || {
             usage
             exit 1
-            ;;
-
-    esac
-}
-
-main "$@"
+        }
+        pull_model "$2"
+        ;;
+    remove|rm)
+        [[ $# -eq 2 ]] || {
+            usage
+            exit 1
+        }
+        remove_model "$2"
+        ;;
+    *)
+        usage
+        exit 1
+        ;;
+esac
