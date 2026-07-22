@@ -186,6 +186,21 @@ Run:
 python -m src.main
 ```
 
+## Document Indexing
+
+Start the platform
+
+```bash
+docker compose up -d
+```
+
+Run the indexer
+
+```bash
+uv run python examples/index_documents.py
+```
+
+
 ## Documentation
 
 Start with:

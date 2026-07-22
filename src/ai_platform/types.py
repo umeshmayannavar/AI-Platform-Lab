@@ -20,3 +20,4 @@ class Chunk:
 
     id: int
     text: str
+    source: Path

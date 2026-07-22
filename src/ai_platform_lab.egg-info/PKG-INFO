@@ -7,6 +7,8 @@ Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: openai>=1.90.0
 Requires-Dist: litellm
+Requires-Dist: openai>=1.50.0
+Requires-Dist: qdrant-client>=1.11.0
 Dynamic: license-file
 
 # Platform Foundation

@@ -1,8 +1,11 @@
+from pathlib import Path
+
 from ai_platform.types import Chunk
 
 
 def chunk_text(
     text: str,
+    source: Path,
     chunk_size: int = 1000,
     overlap: int = 200,
 ) -> list[Chunk]:
@@ -10,7 +13,7 @@ def chunk_text(
     Split text into overlapping chunks.
     """
 
-    chunks = []
+    chunks: list[Chunk] = []
 
     start = 0
     chunk_id = 1
@@ -23,6 +26,7 @@ def chunk_text(
             Chunk(
                 id=chunk_id,
                 text=text[start:end],
+                source=source,
             )
         )
 
