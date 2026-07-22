@@ -8,6 +8,8 @@ requires-python = ">=3.11"
 dependencies = [
     "openai>=1.90.0",
     "litellm",
+    "openai>=1.50.0",
+    "qdrant-client>=1.11.0",
 ]
 
 [build-system]
