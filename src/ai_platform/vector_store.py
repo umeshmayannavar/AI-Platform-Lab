@@ -1,14 +1,18 @@
 from uuid import uuid4
 
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, PointStruct, VectorParams
+from qdrant_client.models import (
+    Distance,
+    PointStruct,
+    VectorParams,
+)
 
 from ai_platform.types import Chunk
 
 
 class VectorStore:
     """
-    Handles all interactions with Qdrant.
+    Wrapper around Qdrant operations.
     """
 
     def __init__(
@@ -17,6 +21,7 @@ class VectorStore:
         port: int = 6333,
         collection_name: str = "documents",
     ):
+
         self.collection_name = collection_name
 
         self.client = QdrantClient(
@@ -24,14 +29,22 @@ class VectorStore:
             port=port,
         )
 
-    def create_collection(self, vector_size: int):
+    def create_collection(
+        self,
+        vector_size: int,
+    ):
 
         collections = self.client.get_collections().collections
 
-        existing = {collection.name for collection in collections}
+        existing = {
+            collection.name
+            for collection in collections
+        }
 
         if self.collection_name in existing:
-            print(f"✓ Collection '{self.collection_name}' already exists")
+            print(
+                f"✓ Collection '{self.collection_name}' already exists"
+            )
             return
 
         self.client.create_collection(
@@ -42,7 +55,9 @@ class VectorStore:
             ),
         )
 
-        print(f"✓ Created collection '{self.collection_name}'")
+        print(
+            f"✓ Created collection '{self.collection_name}'"
+        )
 
     def upsert(
         self,
@@ -64,3 +79,33 @@ class VectorStore:
                 )
             ],
         )
+
+    def search(
+        self,
+        embedding: list[float],
+        limit: int = 3,
+    ) -> list[dict]:
+        """
+        Perform semantic similarity search.
+        """
+
+        results = self.client.query_points(
+            collection_name=self.collection_name,
+            query=embedding,
+            limit=limit,
+        )
+
+        matches = []
+
+        for point in results.points:
+
+            matches.append(
+                {
+                    "score": point.score,
+                    "text": point.payload["text"],
+                    "source": point.payload["source"],
+                    "chunk_id": point.payload["chunk_id"],
+                }
+            )
+
+        return matches
