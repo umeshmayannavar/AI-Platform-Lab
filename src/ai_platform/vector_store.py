@@ -12,7 +12,7 @@ from ai_platform.types import Chunk
 
 class VectorStore:
     """
-    Wrapper around Qdrant operations.
+    Wrapper around Qdrant vector operations.
     """
 
     def __init__(
@@ -21,7 +21,6 @@ class VectorStore:
         port: int = 6333,
         collection_name: str = "documents",
     ):
-
         self.collection_name = collection_name
 
         self.client = QdrantClient(
@@ -59,6 +58,32 @@ class VectorStore:
             f"✓ Created collection '{self.collection_name}'"
         )
 
+    def delete_collection(self):
+
+        collections = self.client.get_collections().collections
+
+        existing = {
+            collection.name
+            for collection in collections
+        }
+
+        if self.collection_name not in existing:
+            return
+
+        self.client.delete_collection(
+            collection_name=self.collection_name
+        )
+
+        print(
+            f"✓ Deleted collection '{self.collection_name}'"
+        )
+
+    def collection_info(self):
+
+        return self.client.get_collection(
+            self.collection_name
+        )
+
     def upsert(
         self,
         chunk: Chunk,
@@ -85,9 +110,6 @@ class VectorStore:
         embedding: list[float],
         limit: int = 3,
     ) -> list[dict]:
-        """
-        Perform semantic similarity search.
-        """
 
         results = self.client.query_points(
             collection_name=self.collection_name,
