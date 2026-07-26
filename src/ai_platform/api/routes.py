@@ -7,6 +7,7 @@ from fastapi import Depends
 from fastapi import HTTPException
 
 from ai_platform.api.dependencies import (
+    get_llm_service,
     get_rag_service,
 )
 
@@ -17,8 +18,7 @@ from ai_platform.api.models import (
     RAGResponse,
 )
 
-from ai_platform.llm import chat
-
+from ai_platform.llm import LLMService
 from ai_platform.rag import RAGService
 
 
@@ -67,11 +67,12 @@ def ready():
 )
 def chat_endpoint(
     request: ChatRequest,
+    llm_service: LLMService = Depends(get_llm_service),
 ) -> ChatResponse:
 
     try:
 
-        response = chat(
+        response = llm_service.generate(
             request.prompt,
         )
 
@@ -108,6 +109,8 @@ def rag_endpoint(
         )
 
     except Exception as exc:
+
+        print(f"RAG Error: {exc}")
 
         raise HTTPException(
             status_code=500,

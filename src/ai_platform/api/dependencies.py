@@ -5,6 +5,7 @@ FastAPI dependency providers.
 from functools import lru_cache
 
 from ai_platform.embeddings import EmbeddingClient
+from ai_platform.llm import LLMService
 from ai_platform.rag import (
     ContextBuilder,
     RAGService,
@@ -33,9 +34,16 @@ def get_retrieval_service() -> RetrievalService:
 
 
 @lru_cache()
+def get_llm_service() -> LLMService:
+
+    return LLMService()
+
+
+@lru_cache()
 def get_rag_service() -> RAGService:
 
     return RAGService(
         retrieval_service=get_retrieval_service(),
         context_builder=ContextBuilder(),
+        llm_service=get_llm_service(),
     )

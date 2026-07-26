@@ -2,7 +2,7 @@
 Retrieval-Augmented Generation (RAG) service.
 """
 
-from ai_platform.llm import chat
+from ai_platform.llm import LLMService
 from ai_platform.rag.context import ContextBuilder
 from ai_platform.retrieval.service import RetrievalService
 
@@ -16,9 +16,11 @@ class RAGService:
         self,
         retrieval_service: RetrievalService,
         context_builder: ContextBuilder,
+        llm_service: LLMService,
     ):
         self.retrieval_service = retrieval_service
         self.context_builder = context_builder
+        self.llm_service = llm_service
 
     def answer(
         self,
@@ -45,7 +47,9 @@ class RAGService:
 
         print("4. Calling LLM...")
 
-        response = chat(prompt)
+        response = self.llm_service.generate(
+            prompt,
+        )
 
         print("5. LLM finished")
 
