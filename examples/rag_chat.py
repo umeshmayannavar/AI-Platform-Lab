@@ -1,5 +1,5 @@
 from ai_platform.embeddings import EmbeddingClient
-from ai_platform.rag import RAGService
+from ai_platform.rag import ContextBuilder, RAGService
 from ai_platform.retrieval.service import RetrievalService
 from ai_platform.vector_store import VectorStore
 
@@ -15,8 +15,11 @@ def main():
         vector_store,
     )
 
+    context_builder = ContextBuilder()
+
     rag = RAGService(
-        retrieval,
+        retrieval_service=retrieval,
+        context_builder=context_builder,
     )
 
     print("=" * 60)

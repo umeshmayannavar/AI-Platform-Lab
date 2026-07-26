@@ -1,4 +1,1 @@
 ai_platform
-config
-llm
-rag

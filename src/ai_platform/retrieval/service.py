@@ -2,6 +2,8 @@
 Semantic retrieval service.
 """
 
+from ai_platform.config import settings
+
 from ai_platform.embeddings import EmbeddingClient
 from ai_platform.vector_store import VectorStore
 
@@ -23,8 +25,14 @@ class RetrievalService:
     def retrieve(
         self,
         question: str,
-        top_k: int = 3,
+        top_k: int | None = None,
     ) -> list[dict]:
+        """
+        Retrieve the most relevant chunks for a question.
+
+        If ``top_k`` is not provided, the default configured
+        retrieval limit from application settings is used.
+        """
 
         embedding = self.embedding_client.embed(
             question
@@ -32,5 +40,5 @@ class RetrievalService:
 
         return self.vector_store.search(
             embedding,
-            limit=top_k,
+            limit=top_k or settings.retrieval.top_k,
         )

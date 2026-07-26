@@ -7,28 +7,23 @@ calling Ollama directly.
 
 from openai import OpenAI
 
-
-DEFAULT_BASE_URL = "http://localhost:4000"
-DEFAULT_API_KEY = "ai-platform-lab"
+from ai_platform.config import settings
 
 
-def create_client(
-    base_url: str = DEFAULT_BASE_URL,
-    api_key: str = DEFAULT_API_KEY,
-) -> OpenAI:
+def create_client() -> OpenAI:
     """
     Create an OpenAI-compatible client that points to LiteLLM.
     """
 
     return OpenAI(
-        base_url=f"{base_url}/",
-        api_key=api_key,
+        base_url=f"{settings.litellm.base_url}/",
+        api_key=settings.litellm.api_key,
     )
 
 
 def chat(
     prompt: str,
-    model: str = "chat",
+    model: str | None = None,
 ) -> str:
     """
     Send a simple chat request.
@@ -37,7 +32,7 @@ def chat(
     client = create_client()
 
     response = client.chat.completions.create(
-        model=model,
+        model=model or settings.models.chat,
         messages=[
             {
                 "role": "user",
