@@ -1,8 +1,8 @@
 """
-LiteLLM client helpers.
+LLM service abstraction.
 
-All application code should use this module instead of
-calling Ollama directly.
+All application code should use LLMService instead of
+calling LiteLLM directly.
 """
 
 from openai import OpenAI
@@ -10,35 +10,36 @@ from openai import OpenAI
 from ai_platform.config import settings
 
 
-def create_client() -> OpenAI:
+class LLMService:
     """
-    Create an OpenAI-compatible client that points to LiteLLM.
-    """
+    Service responsible for LLM interactions.
 
-    return OpenAI(
-        base_url=f"{settings.litellm.base_url}/",
-        api_key=settings.litellm.api_key,
-    )
-
-
-def chat(
-    prompt: str,
-    model: str | None = None,
-) -> str:
-    """
-    Send a simple chat request.
+    Currently backed by LiteLLM using the OpenAI-compatible API.
     """
 
-    client = create_client()
+    def __init__(self):
+        self.client = OpenAI(
+            base_url=f"{settings.litellm.base_url}/",
+            api_key=settings.litellm.api_key,
+        )
 
-    response = client.chat.completions.create(
-        model=model or settings.models.chat,
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
-    )
+    def generate(
+        self,
+        prompt: str,
+        model: str | None = None,
+    ) -> str:
+        """
+        Generate a response from the configured LLM.
+        """
 
-    return response.choices[0].message.content
+        response = self.client.chat.completions.create(
+            model=model or settings.models.chat,
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+        )
+
+        return response.choices[0].message.content
