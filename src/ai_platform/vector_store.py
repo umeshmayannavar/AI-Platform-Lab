@@ -7,6 +7,7 @@ from qdrant_client.models import (
     VectorParams,
 )
 
+from ai_platform.config import settings
 from ai_platform.types import Chunk
 
 
@@ -15,17 +16,13 @@ class VectorStore:
     Wrapper around Qdrant vector operations.
     """
 
-    def __init__(
-        self,
-        host: str = "localhost",
-        port: int = 6333,
-        collection_name: str = "documents",
-    ):
-        self.collection_name = collection_name
+    def __init__(self):
+
+        self.collection_name = settings.qdrant.collection
 
         self.client = QdrantClient(
-            host=host,
-            port=port,
+            host=settings.qdrant.host,
+            port=settings.qdrant.port,
         )
 
     def create_collection(
@@ -71,7 +68,7 @@ class VectorStore:
             return
 
         self.client.delete_collection(
-            collection_name=self.collection_name
+            collection_name=self.collection_name,
         )
 
         print(
@@ -81,7 +78,7 @@ class VectorStore:
     def collection_info(self):
 
         return self.client.get_collection(
-            self.collection_name
+            self.collection_name,
         )
 
     def upsert(
@@ -108,13 +105,16 @@ class VectorStore:
     def search(
         self,
         embedding: list[float],
-        limit: int = 3,
+        limit: int | None = None,
     ) -> list[dict]:
+        """
+        Perform semantic similarity search.
+        """
 
         results = self.client.query_points(
             collection_name=self.collection_name,
             query=embedding,
-            limit=limit,
+            limit=limit or settings.retrieval.top_k,
         )
 
         matches = []
