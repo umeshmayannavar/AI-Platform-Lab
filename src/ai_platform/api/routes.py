@@ -3,7 +3,12 @@ API routes for AI Platform Lab.
 """
 
 from fastapi import APIRouter
+from fastapi import Depends
 from fastapi import HTTPException
+
+from ai_platform.api.dependencies import (
+    get_rag_service,
+)
 
 from ai_platform.api.models import (
     ChatRequest,
@@ -11,14 +16,11 @@ from ai_platform.api.models import (
     RAGRequest,
     RAGResponse,
 )
-from ai_platform.embeddings import EmbeddingClient
+
 from ai_platform.llm import chat
-from ai_platform.rag import (
-    ContextBuilder,
-    RAGService,
-)
-from ai_platform.retrieval.service import RetrievalService
-from ai_platform.vector_store import VectorStore
+
+from ai_platform.rag import RAGService
+
 
 router = APIRouter()
 
@@ -66,9 +68,6 @@ def ready():
 def chat_endpoint(
     request: ChatRequest,
 ) -> ChatResponse:
-    """
-    Generate a response using the configured LLM.
-    """
 
     try:
 
@@ -95,30 +94,12 @@ def chat_endpoint(
 )
 def rag_endpoint(
     request: RAGRequest,
+    rag_service: RAGService = Depends(get_rag_service),
 ) -> RAGResponse:
-    """
-    Generate an answer using Retrieval-Augmented Generation.
-    """
 
     try:
 
-        embedding_client = EmbeddingClient()
-
-        vector_store = VectorStore()
-
-        retrieval = RetrievalService(
-            embedding_client,
-            vector_store,
-        )
-
-        context_builder = ContextBuilder()
-
-        rag = RAGService(
-            retrieval_service=retrieval,
-            context_builder=context_builder,
-        )
-
-        answer = rag.answer(
+        answer = rag_service.answer(
             request.question,
         )
 
