@@ -1,40 +1,35 @@
-from ai_platform.retriever import Retriever
+from ai_platform.embeddings import EmbeddingClient
+from ai_platform.retrieval.service import RetrievalService
+from ai_platform.vector_store import VectorStore
 
 
-def main():
+embedding_client = EmbeddingClient()
 
-    retriever = Retriever()
+vector_store = VectorStore()
 
-    query = input(
-        "Search Query: "
-    )
+retriever = RetrievalService(
+    embedding_client,
+    vector_store,
+)
+
+question = input("Question: ")
+
+matches = retriever.retrieve(question)
+
+print()
+
+print("=" * 60)
+print("Top Matches")
+print("=" * 60)
+
+for index, match in enumerate(matches, start=1):
 
     print()
 
-    results = retriever.retrieve(query)
+    print(f"Match #{index}")
+    print(f"Score : {match['score']:.2f}")
+    print(f"Source: {match['source']}")
 
-    print("=" * 60)
+    print()
 
-    print("Top Matches")
-
-    print("=" * 60)
-
-    for index, result in enumerate(results, start=1):
-
-        print()
-
-        print(f"Match #{index}")
-
-        print(f"Score : {result['score']:.4f}")
-
-        print(f"Source: {result['source']}")
-
-        print()
-
-        print(result["text"])
-
-        print("-" * 60)
-
-
-if __name__ == "__main__":
-    main()
+    print(match["text"])
