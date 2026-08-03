@@ -48,6 +48,18 @@ class QdrantSettings:
 
 
 @dataclass(frozen=True)
+class OllamaSettings:
+    """
+    Ollama runtime configuration.
+    """
+
+    base_url: str = os.getenv(
+        "OLLAMA_URL",
+        "http://localhost:11434",
+    )
+
+
+@dataclass(frozen=True)
 class ModelSettings:
     """
     Model aliases exposed by LiteLLM.
@@ -86,6 +98,7 @@ class Settings:
 
     litellm: LiteLLMSettings = LiteLLMSettings()
     qdrant: QdrantSettings = QdrantSettings()
+    ollama: OllamaSettings = OllamaSettings()
     models: ModelSettings = ModelSettings()
     retrieval: RetrievalSettings = RetrievalSettings()
 
