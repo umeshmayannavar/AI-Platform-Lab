@@ -248,6 +248,56 @@ services:
 
     networks:
       - ai-platform
+  # -------------------------------------------------------------
+  # Grafana
+  #
+  # Platform Dashboards
+  #
+  # Connects to:
+  #   Prometheus
+  #
+  # Default Login
+  #
+  # Username: admin
+  # Password: admin
+  #
+  # -------------------------------------------------------------
+
+  grafana:
+
+    image: grafana/grafana:latest
+
+    container_name: ${COMPOSE_PROJECT_NAME:-ai-platform-lab}-grafana
+
+    restart: unless-stopped
+
+    depends_on:
+
+      prometheus:
+
+        condition: service_started
+
+    environment:
+
+      GF_SECURITY_ADMIN_USER: admin
+
+      GF_SECURITY_ADMIN_PASSWORD: admin
+
+    ports:
+
+      - "3001:3000"
+
+    volumes:
+
+      - grafana-data:/var/lib/grafana
+
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+
+      - ./dashboards:/var/lib/grafana/dashboards
+
+    networks:
+
+      - ai-platform
 
 # -------------------------------------------------------------
 # Networking
@@ -260,8 +310,14 @@ networks:
 # -------------------------------------------------------------
 # Persistent Storage
 # -------------------------------------------------------------
-
 volumes:
+
   ollama-data:
+
   qdrant-data:
+
   open-webui-data:
+
+  prometheus-data:
+
+  grafana-data:
