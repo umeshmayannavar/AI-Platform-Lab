@@ -293,7 +293,7 @@ services:
 
       - ./docker/grafana/provisioning:/etc/grafana/provisioning
 
-      - ./dashboards:/var/lib/grafana/dashboards
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards
 
     networks:
 
